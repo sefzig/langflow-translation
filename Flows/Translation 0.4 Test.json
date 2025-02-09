@@ -1,0 +1,808 @@
+{
+  "id": "5c558d7a-dc9c-4358-8924-0193e4eecf73",
+  "tags": null,
+  "gradient": null,
+  "user_id": "7023f734-fe08-4ede-9fa2-1b4a6386a7e3",
+  "folder_id": "2a6949b7-45ad-4dff-aa5a-c51e5652a2a2",
+  "icon_bg_color": null,
+  "is_component": false,
+  "data": {
+    "nodes": [
+      {
+        "id": "ChatInput-qn5rB",
+        "type": "genericNode",
+        "position": {
+          "x": 45.90769416297269,
+          "y": 10.771230022415562
+        },
+        "data": {
+          "node": {
+            "template": {
+              "_type": "Component",
+              "files": {
+                "trace_as_metadata": true,
+                "file_path": "",
+                "fileTypes": [
+                  "txt",
+                  "md",
+                  "mdx",
+                  "csv",
+                  "json",
+                  "yaml",
+                  "yml",
+                  "xml",
+                  "html",
+                  "htm",
+                  "pdf",
+                  "docx",
+                  "py",
+                  "sh",
+                  "sql",
+                  "js",
+                  "ts",
+                  "tsx",
+                  "jpg",
+                  "jpeg",
+                  "png",
+                  "bmp",
+                  "image"
+                ],
+                "list": true,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "files",
+                "value": "",
+                "display_name": "Files",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Files to be sent with the message.",
+                "title_case": false,
+                "type": "file",
+                "_input_type": "FileInput"
+              },
+              "background_color": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "background_color",
+                "value": "",
+                "display_name": "Background Color",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "The background color of the icon.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              },
+              "chat_icon": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "chat_icon",
+                "value": "",
+                "display_name": "Icon",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "The icon of the message.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              },
+              "code": {
+                "type": "code",
+                "required": true,
+                "placeholder": "",
+                "list": false,
+                "show": true,
+                "multiline": true,
+                "value": "from langflow.base.data.utils import IMG_FILE_TYPES, TEXT_FILE_TYPES\nfrom langflow.base.io.chat import ChatComponent\nfrom langflow.inputs import BoolInput\nfrom langflow.io import (\n    DropdownInput,\n    FileInput,\n    MessageTextInput,\n    MultilineInput,\n    Output,\n)\nfrom langflow.schema.message import Message\nfrom langflow.utils.constants import (\n    MESSAGE_SENDER_AI,\n    MESSAGE_SENDER_NAME_USER,\n    MESSAGE_SENDER_USER,\n)\n\n\nclass ChatInput(ChatComponent):\n    display_name = \"Chat Input\"\n    description = \"Get chat inputs from the Playground.\"\n    icon = \"MessagesSquare\"\n    name = \"ChatInput\"\n    minimized = True\n\n    inputs = [\n        MultilineInput(\n            name=\"input_value\",\n            display_name=\"Text\",\n            value=\"\",\n            info=\"Message to be passed as input.\",\n            input_types=[],\n        ),\n        BoolInput(\n            name=\"should_store_message\",\n            display_name=\"Store Messages\",\n            info=\"Store the message in the history.\",\n            value=True,\n            advanced=True,\n        ),\n        DropdownInput(\n            name=\"sender\",\n            display_name=\"Sender Type\",\n            options=[MESSAGE_SENDER_AI, MESSAGE_SENDER_USER],\n            value=MESSAGE_SENDER_USER,\n            info=\"Type of sender.\",\n            advanced=True,\n        ),\n        MessageTextInput(\n            name=\"sender_name\",\n            display_name=\"Sender Name\",\n            info=\"Name of the sender.\",\n            value=MESSAGE_SENDER_NAME_USER,\n            advanced=True,\n        ),\n        MessageTextInput(\n            name=\"session_id\",\n            display_name=\"Session ID\",\n            info=\"The session ID of the chat. If empty, the current session ID parameter will be used.\",\n            advanced=True,\n        ),\n        FileInput(\n            name=\"files\",\n            display_name=\"Files\",\n            file_types=TEXT_FILE_TYPES + IMG_FILE_TYPES,\n            info=\"Files to be sent with the message.\",\n            advanced=True,\n            is_list=True,\n        ),\n        MessageTextInput(\n            name=\"background_color\",\n            display_name=\"Background Color\",\n            info=\"The background color of the icon.\",\n            advanced=True,\n        ),\n        MessageTextInput(\n            name=\"chat_icon\",\n            display_name=\"Icon\",\n            info=\"The icon of the message.\",\n            advanced=True,\n        ),\n        MessageTextInput(\n            name=\"text_color\",\n            display_name=\"Text Color\",\n            info=\"The text color of the name\",\n            advanced=True,\n        ),\n    ]\n    outputs = [\n        Output(display_name=\"Message\", name=\"message\", method=\"message_response\"),\n    ]\n\n    async def message_response(self) -> Message:\n        background_color = self.background_color\n        text_color = self.text_color\n        icon = self.chat_icon\n\n        message = await Message.create(\n            text=self.input_value,\n            sender=self.sender,\n            sender_name=self.sender_name,\n            session_id=self.session_id,\n            files=self.files,\n            properties={\n                \"background_color\": background_color,\n                \"text_color\": text_color,\n                \"icon\": icon,\n            },\n        )\n        if self.session_id and isinstance(message, Message) and self.should_store_message:\n            stored_message = await self.send_message(\n                message,\n            )\n            self.message.value = stored_message\n            message = stored_message\n\n        self.status = message\n        return message\n",
+                "fileTypes": [],
+                "file_path": "",
+                "password": false,
+                "name": "code",
+                "advanced": true,
+                "dynamic": true,
+                "info": "",
+                "load_from_db": false,
+                "title_case": false
+              },
+              "input_value": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "multiline": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "input_value",
+                "value": "La Ley 7/2012, de 29 de octubre, de modificación de la normativa tributaria y presupuestaria y de adecuación de la normativa financiera para la intensificación de las actuaciones en la prevención y lucha contra el fraude introduce a través de la nueva disposición adicional decimoctava de la Ley 58/2003, de 17 de diciembre, General Tributaria, una nueva obligación específica de información en materia de bienes y derechos situados en el extranjero.     El desarrollo reglamentario de esta nueva obligación de información ligada al ámbito internacional se encuentra en los artículos 42 bis, 42 ter y 54 bis del Reglamento General de las actuaciones y los procedimientos de gestión e inspección tributaria y de desarrollo de las normas comunes de los procedimientos de aplicación de los tributos aprobado por el Real Decreto 1065/2007, de 27 de julio y que han sido introducidos por el Real Decreto 1558/2012, de 15 de noviembre, por el que se adaptan las normas de desarrollo de la Ley 58/2003, de 17 de diciembre, General Tributaria, a la normativa comunitaria e internacional en materia de asistencia mutua, se establecen obligaciones de información sobre bienes y derechos situados en el extranjero, y se modifica el reglamento de procedimientos amistosos en materia de imposición directa, aprobado por Real Decreto 1794/2008, de 3 de noviembre.     Por otra parte, en lo referente a los obligados tributarios que han de cumplir con la citada obligación de información, es necesario señalar que ésta reviste carácter general, no ligada a un impuesto específico, lo que ha motivado que la normativa haya usado como criterio delimitador un concepto amplio como es el de residencia. Sin embargo, no puede obviarse lo establecido en el apartado 3 de la disposición adicional decimoctava de la Ley 58/2003, de 17 de diciembre, General Tributaria, que preceptúa la posibilidad de que las leyes de los diversos tributos puedan establecer consecuencias especificas en caso de incumplimiento de la obligación de información. En este sentido, la Ley 35/2006, de 28 de noviembre, del Impuesto sobre la Renta de las Personas Físicas y de modificación parcial de las leyes de los Impuestos sobre Sociedades, sobre la Renta de no Residentes y sobre el Patrimonio y el texto refundido de la Ley del Impuesto sobre Sociedades, aprobado por el Real Decreto Legislativo 4/2004, de 5 de marzo, han regulado consecuencias específicas para los contribuyentes obligados a tributar por dichos impuestos por la integridad de su renta, por lo que, claramente, la totalidad de dichos sujetos resulta también obligada a cumplimentar la nueva declaración informativa.     Los citados artículos del Reglamento General de las actuaciones y los procedimientos de gestión e inspección tributaria y de desarrollo de las normas comunes de los procedimientos de aplicación de los tributos establecen en la práctica obligaciones de información sobre tres categorías diferentes de bienes y derechos situados en el extranjero:     Artículo 42 bis. Obligación de informar acerca de cuentas en entidades financieras situadas en el extranjero.     Artículo 42 ter. Obligación de información sobre valores, derechos, seguros y rentas depositados, gestionados u obtenidas en el extranjero.     Artículo 54 bis. Obligación de información sobre bienes inmuebles y derechos sobre bienes inmuebles situados en el extranjero.     Con el objeto de disminuir las cargas formales derivadas del cumplimiento de las obligaciones de información tributaria se ha considerado conveniente refundir en un solo modelo informativo las tres obligaciones mencionadas anteriormente y, aunque la transmisión de la declaración informativa se deba realizar obligatoriamente por medios telemáticos, se pone a disposición de los obligados tributarios un programa de ayuda con el objeto de facilitar tanto la obtención de los ficheros como su adecuada transmisión y que, al mismo tiempo, facilita su correcta cumplimentación.     Los apartados 5 del artículo 42 bis, 5 del artículo 42 ter y 7 del artículo 54 bis, así como el artículo 117 del mencionado Reglamento habilitan, en el ámbito del Estado, al Ministro de Hacienda y Administraciones Públicas para aprobar el modelo de declaración 720, «Declaración informativa sobre bienes y derechos situados en el extranjero».     En su virtud dispongo:          Artículo 1. Aprobación del Modelo 720 y de sus diseños físicos y lógicos.     1. Se aprueba el modelo 720 «Declaración informativa de bienes y derechos situados en el extranjero» cuyos diseños físicos y lógicos figuran en el anexo de esta Orden.     El número identificativo que habrá de figurar en el modelo 720 será un número secuencial cuyos tres primeros dígitos se corresponderán con el código 720.     El número identificativo que habrá de figurar en el modelo 720 en el caso de tratarse de una declaración sustitutiva o complementaria que incorpore registros no declarados previamente será un número secuencial cuyos tres primeros dígitos se correspondan con el código 720.     La presentación de declaraciones complementarias que modifiquen el contenido de datos declarados en otra declaración presentada anteriormente que se refiera al mismo período, se realizará desde el servicio de consulta y modificación de declaraciones informativas dentro de los trámites asociados al modelo 720 y que se encuentra disponible en la Sede electrónica de la Agencia Estatal de Administración Tributaria, en la dirección electrónica https://www.agenciatributaria.gob.es. En este caso la declaración complementaria quedará identificada por el código electrónico de su presentación, no siendo necesario indicar ningún número identificativo.     2. Para efectuar la presentación telemática de la declaración correspondiente al modelo 720 el declarante o, en su caso, el presentador autorizado, deberá utilizar previamente un programa para obtener el fichero con la declaración. Este programa podrá ser el formulario desarrollado por la Agencia Estatal de Administración Tributaria para la declaración correspondiente al modelo 720 u otro que obtenga un fichero con el mismo formato. El contenido del dicho fichero se deberá ajustar a los diseños físicos y lógicos que se describen en el anexo de esta Orden.          Artículo 2. Obligados a presentar el modelo 720.     Estarán obligados a presentar el modelo 720, «Declaración informativa de bienes y derechos situados en el extranjero», las personas físicas y jurídicas residentes en territorio español, los establecimientos permanentes en dicho territorio de personas o entidades no residentes y las entidades a que se refiere el artículo 35.4 de la Ley 58/2003, de 17 de diciembre, General Tributaria, cuando se encuentren en alguno de los supuestos siguientes:     a) Cuando, en su condición de titular, representante, autorizado, beneficiario, persona o entidad con poderes de disposición o titular real conforme a lo previsto en el apartado 2 del artículo 4 de la Ley 10/2010, de 28 de abril, de prevención del blanqueo de capitales y de la financiación del terrorismo, tengan la obligación de informar acerca de las cuentas en entidades financieras situadas en el extranjero de acuerdo con lo dispuesto en los apartados 1, 3 y 5 del artículo 42 bis del Reglamento General de las actuaciones y los procedimientos de gestión e inspección tributaria y de desarrollo de las normas comunes de los procedimientos de aplicación de los tributos, aprobado por el Real Decreto 1065/2007, de 27 de julio, con las excepciones previstas en el apartado 4 del mencionado artículo.     b) Cuando, de acuerdo con lo dispuesto en los apartados 1 y 5 del artículo 42 ter del Reglamento aprobado por el Real Decreto 1065/2007, de 27 de julio, y teniendo en cuenta las excepciones previstas en el apartado 4 del citado artículo, resulten titulares o titulares reales conforme a lo previsto en el apartado 2 del artículo 4 de la Ley 10/2010, de 28 de abril, y siempre que estén situados en el extranjero, de valores o derechos representativos de la participación en cualquier tipo de entidad jurídica, valores representativos de la cesión a terceros de capitales propios o valores aportados para su gestión o administración a cualquier instrumento jurídico, incluyendo fideicomisos y «trusts» o masas patrimoniales que, no obstante carecer de personalidad jurídica, puedan actuar en el tráfico económico.     c) Cuando, según lo dispuesto en los apartados 2 y 5 del artículo 42 ter del Reglamento aprobado por el Real Decreto 1065/2007, de 27 de julio, con las excepciones previstas en el apartado 4 del citado artículo, resulten titulares o titulares reales conforme a lo previsto en el apartado 2 del artículo 4 de la Ley 10/2010, de 28 de abril, de acciones y participaciones en el capital social o fondo patrimonial de instituciones de inversión colectiva situadas en el extranjero.     d) Cuando, según lo dispuesto en los apartados 3 y 5 del artículo 42 ter del Reglamento aprobado por el Real Decreto 1065/2007, de 27 de julio, con las excepciones previstas en el apartado 4 del citado artículo, resulten tomadores a 31 de diciembre de cada año de seguros de vida o invalidez cuando la entidad aseguradora se encuentre situada en el extranjero o cuando sean beneficiarios a 31 de diciembre de cada año de rentas temporales o vitalicias como consecuencia de la entrega de un capital en dinero, de derechos de contenido económico o de bienes muebles o inmuebles, a entidades situadas en el extranjero.     En caso de que el tomador del seguro sea persona distinta del beneficiario de la renta y conserve el derecho de rescate, será dicho tomador el obligado a presentar el modelo 720.     e) Cuando, según lo dispuesto en los apartados 1, 5 y 7 del artículo 54 bis del Reglamento aprobado por el Real Decreto 1065/2007, de 27 de julio, con las excepciones previstas en el apartado 6 del citado artículo, sean titulares o tengan la consideración de titular real conforme a lo previsto en el apartado 2 del artículo 4 de la Ley 10/2010, de 28 de abril, respecto de bienes inmuebles y derechos sobre bienes inmuebles situados en el extranjero.          Artículo 3. Contenido de la declaración informativa modelo 720.     El modelo 720, «Declaración informativa sobre bienes y derechos situados en el extranjero», comprenderá los siguientes contenidos:     a) La información a suministrar sobre cuentas en entidades financieras situadas en el extranjero regulada en el artículo 42 bis del Reglamento aprobado por el Real Decreto 1065/2007, de 27 de julio y que comprenderá la información descrita en los apartados 2 y 3 del citado artículo.     b) La información a suministrar sobre valores o derechos situados en el extranjero regulada en el apartado 1 del artículo 42 ter del Reglamento aprobado por el Real Decreto 1065/2007, de 27 de julio, y que comprenderá la información que se describe en el mismo apartado 1 del mencionado artículo.     c) La información a suministrar según el apartado 2 del artículo 42 ter del Reglamento aprobado por el Real Decreto 1065/2007, de 27 de julio, sobre las acciones y participaciones en el capital social o fondo patrimonial de instituciones de inversión colectiva situadas en el extranjero, y que comprenderá la información descrita en el citado apartado 2 de dicho artículo.     d) La información a suministrar del apartado 3 del artículo 42 ter del Reglamento aprobado por el Real Decreto 1065/2007, de 27 de julio, sobre seguros de vida e invalidez cuando la entidad aseguradora se encuentre situada en el extranjero o sobre las rentas temporales o vitalicias obtenidas como consecuencia de la entrega de un capital en dinero, de derechos de contenido económico o de bienes muebles o inmuebles, a entidades situadas en el extranjero y que comprenderá la información que se describe en el citado apartado 3 del mencionado artículo.     e) La información a suministrar sobre bienes inmuebles y derechos sobre bienes inmuebles situados en el extranjero regulada en el artículo 54 bis del Reglamento aprobado por el RD 1065/2007, de 27 de julio, y que comprenderá la información descrita en los apartados 2, 3 y 4 del citado artículo.          Artículo 4. Forma de presentación del modelo 720.     La presentación del modelo 720, «Declaración informativa sobre bienes y derechos situados en el extranjero», se efectuará por vía telemática a través de Internet, de acuerdo con las condiciones y el procedimiento previsto en los artículos 5 y 6 de esta Orden.          Artículo 5. Condiciones generales de presentación telemática.     1. La presentación de la declaración por vía telemática a través de Internet podrá ser efectuada bien por el propio declarante o bien por un tercero que actúe en su representación, de acuerdo con lo establecido en los artículos 79 a 81, ambos inclusive, del Reglamento General de las actuaciones y los procedimientos de gestión e inspección tributaria y de desarrollo de las normas comunes de los procedimientos de aplicación de los tributos, aprobado por el Real Decreto 1065/2007, de 27 de julio, y en la Orden HAC/1398/2003, de 27 de mayo, por la que se establecen los supuestos y condiciones en que podrá hacerse efectiva la colaboración social en la gestión de los tributos, y se extiende ésta expresamente a la presentación telemática de determinados modelos de declaración y otros documentos tributarios.     2. La presentación telemática estará sujeta a las siguientes condiciones:     a) El declarante deberá disponer de Número de Identificación Fiscal (NIF).     b) El declarante deberá tener instalado en el navegador un certificado electrónico X.509.V3 expedido por la Fábrica Nacional de Moneda y Timbre-Real Casa de la Moneda, sistemas de firma electrónica incorporados al Documento Nacional de Identidad (DNI-e), o cualquier otro certificado electrónico admitido por la Agencia Estatal de Administración Tributaria previamente instalado en el navegador a tal efecto, de acuerdo con lo previsto en la Orden HAC/1181/2003, de 12 de mayo, por la que se establecen normas específicas sobre el uso de la firma electrónica en las relaciones tributarias por medios electrónicos, informáticos y telemáticos con la Agencia Estatal de Administración Tributaria.     Si la presentación telemática va a ser realizada por una persona o entidad autorizada para presentar declaraciones en representación de terceras personas, será esta persona o entidad autorizada quien deberá tener instalado en el navegador su certificado.     c) Para efectuar la presentación telemática, el declarante, o en su caso, el presentador, deberá transmitir los ficheros ajustados a los diseños de registros tipo 1 y tipo 2 que figuran en el anexo de esta Orden.     3. En aquellos casos en que se detecten anomalías de tipo formal en la transmisión telemática de declaraciones, dicha circunstancia se pondrá en conocimiento del presentador de la declaración por el propio sistema mediante los correspondientes mensajes de error, para que proceda a su subsanación.          Artículo 6. Procedimiento para la presentación telemática de las declaraciones correspondientes al modelo 720.     1. El procedimiento para la presentación telemática por Internet de las declaraciones correspondientes al modelo 720 será el siguiente:     a) El declarante o, en su caso, el presentador, se pondrá en comunicación con la Sede electrónica de la Agencia Estatal de Administración Tributaria en Internet, en la dirección electrónica https://www.agenciatributaria.gob.es y seleccionará el modelo a transmitir (modelo 720).     b) A continuación procederá a transmitir la correspondiente declaración con la firma electrónica generada al seleccionar el certificado previamente instalado en el navegador a tal efecto.     Si el presentador es una persona o entidad autorizada a presentar declaraciones en representación de terceras personas, se requerirá una única firma, la correspondiente a su certificado.     c) Si la declaración es aceptada, la Agencia Estatal de Administración Tributaria le devolverá en pantalla los datos de registro de tipo 1 que figuran en el anexo de la Orden, validados con un código seguro de verificación de 16 caracteres, además de la fecha y hora de presentación.     d) En el supuesto de que la presentación fuera rechazada se mostrará en pantalla un mensaje con la descripción de los errores detectados, debiendo proceder a la subsanación de los mismos.     e) El declarante, o en su caso, el presentador deberá conservar la declaración aceptada, modelo 720, así como el registro tipo 1 debidamente validado con el correspondiente código seguro de verificación.     f) Con posterioridad a la recepción del fichero transmitido y con el fin de que la información sea procesada e incorporada al sistema de información de la Agencia Estatal de Administración Tributaria correctamente, el Departamento de Informática Tributaria de la Agencia Estatal de Administración Tributaria efectuará un proceso de validación de datos suministrados de forma telemática, en el que se verificará que las características de la información se ajustan a las especificaciones establecidas de acuerdo con los diseños físicos y lógicos descritos en el anexo de esta Orden.     g) Una vez realizado dicho proceso, en el servicio de consulta y modificación de declaraciones informativas en la Sede electrónica de la Agencia Estatal de Administración Tributaria (https://www.agenciatributaria.gob.es), se ofrecerá al obligado tributario la información individualizada de los errores detectados en las declaraciones para que pueda proceder a su corrección. En caso de que no se hayan subsanado los defectos observados se podrá requerir al obligado para que en el plazo de 10 días, contados a partir del día siguiente al de la notificación del requerimiento, subsane los defectos de que adolezca. Transcurrido dicho plazo sin haber atendido el requerimiento, de persistir anomalías que impidan a la Administración tributaria el conocimiento de los datos, se le tendrá, en su caso, por no cumplida la obligación correspondiente y se procederá al archivo sin más trámite.     2. En aquellos supuestos en que por razones de carácter técnico no fuera posible efectuar la presentación por Internet en el plazo a que se refiere el artículo 7 de esta Orden, dicha presentación podrá efectuarse durante los tres días naturales siguientes al de finalización de dicho plazo.          Artículo 7. Plazo de presentación del modelo 720.     La presentación del modelo 720, «Declaración informativa sobre bienes y derechos situados en el extranjero», se realizará entre el 1 de enero y el 31 de marzo del año siguiente a aquel al que se refiera la información a suministrar.",
+                "display_name": "Text",
+                "advanced": false,
+                "input_types": [],
+                "dynamic": false,
+                "info": "Message to be passed as input.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MultilineInput"
+              },
+              "sender": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "options": [
+                  "Machine",
+                  "User"
+                ],
+                "options_metadata": [],
+                "combobox": false,
+                "dialog_inputs": {},
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "sender",
+                "value": "User",
+                "display_name": "Sender Type",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Type of sender.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "DropdownInput"
+              },
+              "sender_name": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "sender_name",
+                "value": "User",
+                "display_name": "Sender Name",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "Name of the sender.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              },
+              "session_id": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "session_id",
+                "value": "",
+                "display_name": "Session ID",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "The session ID of the chat. If empty, the current session ID parameter will be used.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              },
+              "should_store_message": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "should_store_message",
+                "value": true,
+                "display_name": "Store Messages",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Store the message in the history.",
+                "title_case": false,
+                "type": "bool",
+                "_input_type": "BoolInput"
+              },
+              "text_color": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "text_color",
+                "value": "",
+                "display_name": "Text Color",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "The text color of the name",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              }
+            },
+            "description": "Get chat inputs from the Playground.",
+            "icon": "MessagesSquare",
+            "base_classes": [
+              "Message"
+            ],
+            "display_name": "Chat Input",
+            "documentation": "",
+            "minimized": true,
+            "custom_fields": {},
+            "output_types": [],
+            "pinned": false,
+            "conditional_paths": [],
+            "frozen": false,
+            "outputs": [
+              {
+                "types": [
+                  "Message"
+                ],
+                "selected": "Message",
+                "name": "message",
+                "display_name": "Message",
+                "method": "message_response",
+                "value": "__UNDEFINED__",
+                "cache": true,
+                "allows_loop": false,
+                "tool_mode": true
+              }
+            ],
+            "field_order": [
+              "input_value",
+              "should_store_message",
+              "sender",
+              "sender_name",
+              "session_id",
+              "files",
+              "background_color",
+              "chat_icon",
+              "text_color"
+            ],
+            "beta": false,
+            "legacy": false,
+            "edited": false,
+            "metadata": {},
+            "tool_mode": false,
+            "lf_version": "1.1.4.post1"
+          },
+          "showNode": true,
+          "type": "ChatInput",
+          "id": "ChatInput-qn5rB"
+        },
+        "selected": false,
+        "measured": {
+          "width": 320,
+          "height": 230
+        },
+        "dragging": false
+      },
+      {
+        "id": "ChatOutput-ZlkFG",
+        "type": "genericNode",
+        "position": {
+          "x": 919.1693362554681,
+          "y": 13.788050553090436
+        },
+        "data": {
+          "node": {
+            "template": {
+              "_type": "Component",
+              "background_color": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "background_color",
+                "value": "",
+                "display_name": "Background Color",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "The background color of the icon.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              },
+              "chat_icon": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "chat_icon",
+                "value": "",
+                "display_name": "Icon",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "The icon of the message.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              },
+              "code": {
+                "type": "code",
+                "required": true,
+                "placeholder": "",
+                "list": false,
+                "show": true,
+                "multiline": true,
+                "value": "from langflow.base.io.chat import ChatComponent\nfrom langflow.inputs import BoolInput\nfrom langflow.io import DropdownInput, MessageInput, MessageTextInput, Output\nfrom langflow.schema.message import Message\nfrom langflow.schema.properties import Source\nfrom langflow.utils.constants import (\n    MESSAGE_SENDER_AI,\n    MESSAGE_SENDER_NAME_AI,\n    MESSAGE_SENDER_USER,\n)\n\n\nclass ChatOutput(ChatComponent):\n    display_name = \"Chat Output\"\n    description = \"Display a chat message in the Playground.\"\n    icon = \"MessagesSquare\"\n    name = \"ChatOutput\"\n    minimized = True\n\n    inputs = [\n        MessageInput(\n            name=\"input_value\",\n            display_name=\"Text\",\n            info=\"Message to be passed as output.\",\n        ),\n        BoolInput(\n            name=\"should_store_message\",\n            display_name=\"Store Messages\",\n            info=\"Store the message in the history.\",\n            value=True,\n            advanced=True,\n        ),\n        DropdownInput(\n            name=\"sender\",\n            display_name=\"Sender Type\",\n            options=[MESSAGE_SENDER_AI, MESSAGE_SENDER_USER],\n            value=MESSAGE_SENDER_AI,\n            advanced=True,\n            info=\"Type of sender.\",\n        ),\n        MessageTextInput(\n            name=\"sender_name\",\n            display_name=\"Sender Name\",\n            info=\"Name of the sender.\",\n            value=MESSAGE_SENDER_NAME_AI,\n            advanced=True,\n        ),\n        MessageTextInput(\n            name=\"session_id\",\n            display_name=\"Session ID\",\n            info=\"The session ID of the chat. If empty, the current session ID parameter will be used.\",\n            advanced=True,\n        ),\n        MessageTextInput(\n            name=\"data_template\",\n            display_name=\"Data Template\",\n            value=\"{text}\",\n            advanced=True,\n            info=\"Template to convert Data to Text. If left empty, it will be dynamically set to the Data's text key.\",\n        ),\n        MessageTextInput(\n            name=\"background_color\",\n            display_name=\"Background Color\",\n            info=\"The background color of the icon.\",\n            advanced=True,\n        ),\n        MessageTextInput(\n            name=\"chat_icon\",\n            display_name=\"Icon\",\n            info=\"The icon of the message.\",\n            advanced=True,\n        ),\n        MessageTextInput(\n            name=\"text_color\",\n            display_name=\"Text Color\",\n            info=\"The text color of the name\",\n            advanced=True,\n        ),\n    ]\n    outputs = [\n        Output(\n            display_name=\"Message\",\n            name=\"message\",\n            method=\"message_response\",\n        ),\n    ]\n\n    def _build_source(self, id_: str | None, display_name: str | None, source: str | None) -> Source:\n        source_dict = {}\n        if id_:\n            source_dict[\"id\"] = id_\n        if display_name:\n            source_dict[\"display_name\"] = display_name\n        if source:\n            source_dict[\"source\"] = source\n        return Source(**source_dict)\n\n    async def message_response(self) -> Message:\n        source, icon, display_name, source_id = self.get_properties_from_source_component()\n        background_color = self.background_color\n        text_color = self.text_color\n        if self.chat_icon:\n            icon = self.chat_icon\n        message = self.input_value if isinstance(self.input_value, Message) else Message(text=self.input_value)\n        message.sender = self.sender\n        message.sender_name = self.sender_name\n        message.session_id = self.session_id\n        message.flow_id = self.graph.flow_id if hasattr(self, \"graph\") else None\n        message.properties.source = self._build_source(source_id, display_name, source)\n        message.properties.icon = icon\n        message.properties.background_color = background_color\n        message.properties.text_color = text_color\n        if self.session_id and isinstance(message, Message) and self.should_store_message:\n            stored_message = await self.send_message(\n                message,\n            )\n            self.message.value = stored_message\n            message = stored_message\n\n        self.status = message\n        return message\n",
+                "fileTypes": [],
+                "file_path": "",
+                "password": false,
+                "name": "code",
+                "advanced": true,
+                "dynamic": true,
+                "info": "",
+                "load_from_db": false,
+                "title_case": false
+              },
+              "data_template": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "data_template",
+                "value": "{text}",
+                "display_name": "Data Template",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "Template to convert Data to Text. If left empty, it will be dynamically set to the Data's text key.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              },
+              "input_value": {
+                "trace_as_input": true,
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "input_value",
+                "value": "",
+                "display_name": "Text",
+                "advanced": false,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "Message to be passed as output.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageInput"
+              },
+              "sender": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "options": [
+                  "Machine",
+                  "User"
+                ],
+                "options_metadata": [],
+                "combobox": false,
+                "dialog_inputs": {},
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "sender",
+                "value": "Machine",
+                "display_name": "Sender Type",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Type of sender.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "DropdownInput"
+              },
+              "sender_name": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "sender_name",
+                "value": "AI",
+                "display_name": "Sender Name",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "Name of the sender.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              },
+              "session_id": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "session_id",
+                "value": "",
+                "display_name": "Session ID",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "The session ID of the chat. If empty, the current session ID parameter will be used.",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              },
+              "should_store_message": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "should_store_message",
+                "value": true,
+                "display_name": "Store Messages",
+                "advanced": true,
+                "dynamic": false,
+                "info": "Store the message in the history.",
+                "title_case": false,
+                "type": "bool",
+                "_input_type": "BoolInput"
+              },
+              "text_color": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "text_color",
+                "value": "",
+                "display_name": "Text Color",
+                "advanced": true,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "The text color of the name",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              }
+            },
+            "description": "Display a chat message in the Playground.",
+            "icon": "MessagesSquare",
+            "base_classes": [
+              "Message"
+            ],
+            "display_name": "Chat Output",
+            "documentation": "",
+            "minimized": true,
+            "custom_fields": {},
+            "output_types": [],
+            "pinned": false,
+            "conditional_paths": [],
+            "frozen": false,
+            "outputs": [
+              {
+                "types": [
+                  "Message"
+                ],
+                "selected": "Message",
+                "name": "message",
+                "display_name": "Message",
+                "method": "message_response",
+                "value": "__UNDEFINED__",
+                "cache": true,
+                "allows_loop": false,
+                "tool_mode": true
+              }
+            ],
+            "field_order": [
+              "input_value",
+              "should_store_message",
+              "sender",
+              "sender_name",
+              "session_id",
+              "data_template",
+              "background_color",
+              "chat_icon",
+              "text_color"
+            ],
+            "beta": false,
+            "legacy": false,
+            "edited": false,
+            "metadata": {},
+            "tool_mode": false,
+            "lf_version": "1.1.4.post1"
+          },
+          "showNode": true,
+          "type": "ChatOutput",
+          "id": "ChatOutput-ZlkFG"
+        },
+        "selected": false,
+        "measured": {
+          "width": 320,
+          "height": 230
+        },
+        "dragging": false
+      },
+      {
+        "id": "CustomComponent-BmS0j",
+        "type": "genericNode",
+        "position": {
+          "x": 482.5008806224122,
+          "y": 11.439067969673996
+        },
+        "data": {
+          "node": {
+            "template": {
+              "_type": "Component",
+              "InputText": {
+                "tool_mode": false,
+                "trace_as_input": true,
+                "trace_as_metadata": true,
+                "load_from_db": false,
+                "list": false,
+                "list_add_label": "Add More",
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "InputText",
+                "value": "",
+                "display_name": "Input Text",
+                "advanced": false,
+                "input_types": [
+                  "Message"
+                ],
+                "dynamic": false,
+                "info": "The string to translate",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "MessageTextInput"
+              },
+              "OutputLanguage": {
+                "tool_mode": false,
+                "trace_as_metadata": true,
+                "options": [
+                  "English",
+                  "German",
+                  "Mandarin",
+                  "Spanish"
+                ],
+                "options_metadata": [],
+                "combobox": false,
+                "dialog_inputs": {},
+                "required": false,
+                "placeholder": "",
+                "show": true,
+                "name": "OutputLanguage",
+                "value": "English",
+                "display_name": "Output Language",
+                "advanced": false,
+                "dynamic": false,
+                "info": "The language to translate to",
+                "title_case": false,
+                "type": "str",
+                "_input_type": "DropdownInput"
+              },
+              "code": {
+                "type": "code",
+                "required": true,
+                "placeholder": "",
+                "list": false,
+                "show": true,
+                "multiline": true,
+                "value": "# ----------------------------------------------\n# Helper: Translation 0.4\n# ----------------------------------------------\n\nfrom langflow.custom import Component\nfrom langflow.io import MessageTextInput, DropdownInput, Output\nfrom langflow.schema.message import Message\nimport requests\nimport json\nimport numpy as np\n\n# Configuration\nflowId = \"1bfd6d0b-f5b9-4312-9035-d032e0107f96\"\ninputLanguage = \"TextInput-kFVwL\"\n\nclass CustomComponent(Component):\n    display_name = \"Translation 0.4\"\n    description = \"Translate the Input Text to the specified Output Language. Make sure the Input Text does not contain line breaks or double quotes. Estimated processing time is 2 minutes.\"\n    documentation: str = \"http://docs.langflow.org/components/custom\"\n    icon = \"languages\"\n    name = \"Translation04\"\n    HelperUrl = \"http://127.0.0.1:7860/api/v1/run/\" + flowId + \"?stream=false\"\n\n    inputs = [\n        MessageTextInput(\n            name=\"InputText\",\n            display_name=\"Input Text\",\n            value='Hola mundo',\n            info=\"The string to translate\"\n        ),\n        DropdownInput(\n            name=\"OutputLanguage\",\n            display_name=\"Output Language\",\n            options=[\"English\", \"German\", \"Mandarin\", \"Spanish\"],\n            value=\"English\",\n            info=\"The language to translate to\",\n        ),\n    ]\n\n    outputs = [\n        Output(display_name=\"Response\", name=\"output\", method=\"build_output\"),\n    ]\n\n    def reduce_dimensions(self,vector, target_dim=1024):\n        if len(vector) == target_dim:\n            return vector\n        elif len(vector) > target_dim:\n            return vector[:target_dim]\n        else:\n            return vector + [0] * (target_dim - len(vector))\n        \n    def build_output(self) -> Message:\n        url = self.HelperUrl\n        method = \"POST\"\n        body = '{ \"input_value\": \"' + self.InputText + '\", \"input_type\": \"chat\", \"output_type\": \"chat\", \"tweaks\": { \"' + inputLanguage + '\": { \"input_value\": \"' + self.OutputLanguage + '\" } } }'\n        \n        try:\n            \n            json_body = json.loads(body)\n            \n            response = requests.request(\n                method=method,\n                url=url,\n                json=json_body,\n                headers={\n                    \"Content-Type\": \"application/json\"\n                }\n            )\n            \n            response.raise_for_status()\n            content = response.json()\n            translation = content[\"outputs\"][0][\"outputs\"][0][\"results\"][\"message\"][\"data\"][\"text\"]\n            output_str = translation\n            \n        except json.JSONDecodeError:\n            output_str = \"Invalid JSON body: \" + body\n        except requests.RequestException as e:\n            output_str = \"error\" + str(e)\n\n        data = Message(text=output_str)\n        self.status = data\n        return data",
+                "fileTypes": [],
+                "file_path": "",
+                "password": false,
+                "name": "code",
+                "advanced": true,
+                "dynamic": true,
+                "info": "",
+                "load_from_db": false,
+                "title_case": false
+              }
+            },
+            "description": "Translate the Input Text to the specified Output Language. Make sure the Input Text does not contain line breaks or double quotes. Estimated processing time is 2 minutes.",
+            "icon": "languages",
+            "base_classes": [
+              "Message"
+            ],
+            "display_name": "Translation 0.4",
+            "documentation": "http://docs.langflow.org/components/custom",
+            "minimized": false,
+            "custom_fields": {},
+            "output_types": [],
+            "pinned": false,
+            "conditional_paths": [],
+            "frozen": false,
+            "outputs": [
+              {
+                "types": [
+                  "Message"
+                ],
+                "selected": "Message",
+                "name": "output",
+                "hidden": null,
+                "display_name": "Response",
+                "method": "build_output",
+                "value": "__UNDEFINED__",
+                "cache": true,
+                "required_inputs": null,
+                "allows_loop": false,
+                "tool_mode": true
+              }
+            ],
+            "field_order": [
+              "InputText",
+              "OutputLanguage"
+            ],
+            "beta": false,
+            "legacy": false,
+            "edited": true,
+            "metadata": {},
+            "tool_mode": false,
+            "lf_version": "1.1.4.post1"
+          },
+          "showNode": true,
+          "type": "Translation04",
+          "id": "CustomComponent-BmS0j"
+        },
+        "selected": false,
+        "measured": {
+          "width": 320,
+          "height": 372
+        },
+        "dragging": false
+      }
+    ],
+    "edges": [
+      {
+        "source": "ChatInput-qn5rB",
+        "sourceHandle": "{œdataTypeœ:œChatInputœ,œidœ:œChatInput-qn5rBœ,œnameœ:œmessageœ,œoutput_typesœ:[œMessageœ]}",
+        "target": "CustomComponent-BmS0j",
+        "targetHandle": "{œfieldNameœ:œInputTextœ,œidœ:œCustomComponent-BmS0jœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
+        "data": {
+          "targetHandle": {
+            "fieldName": "InputText",
+            "id": "CustomComponent-BmS0j",
+            "inputTypes": [
+              "Message"
+            ],
+            "type": "str"
+          },
+          "sourceHandle": {
+            "dataType": "ChatInput",
+            "id": "ChatInput-qn5rB",
+            "name": "message",
+            "output_types": [
+              "Message"
+            ]
+          }
+        },
+        "id": "xy-edge__ChatInput-qn5rB{œdataTypeœ:œChatInputœ,œidœ:œChatInput-qn5rBœ,œnameœ:œmessageœ,œoutput_typesœ:[œMessageœ]}-CustomComponent-BmS0j{œfieldNameœ:œInputTextœ,œidœ:œCustomComponent-BmS0jœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
+        "animated": false,
+        "className": ""
+      },
+      {
+        "source": "CustomComponent-BmS0j",
+        "sourceHandle": "{œdataTypeœ:œTranslation04œ,œidœ:œCustomComponent-BmS0jœ,œnameœ:œoutputœ,œoutput_typesœ:[œMessageœ]}",
+        "target": "ChatOutput-ZlkFG",
+        "targetHandle": "{œfieldNameœ:œinput_valueœ,œidœ:œChatOutput-ZlkFGœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
+        "data": {
+          "targetHandle": {
+            "fieldName": "input_value",
+            "id": "ChatOutput-ZlkFG",
+            "inputTypes": [
+              "Message"
+            ],
+            "type": "str"
+          },
+          "sourceHandle": {
+            "dataType": "Translation04",
+            "id": "CustomComponent-BmS0j",
+            "name": "output",
+            "output_types": [
+              "Message"
+            ]
+          }
+        },
+        "id": "xy-edge__CustomComponent-BmS0j{œdataTypeœ:œTranslation04œ,œidœ:œCustomComponent-BmS0jœ,œnameœ:œoutputœ,œoutput_typesœ:[œMessageœ]}-ChatOutput-ZlkFG{œfieldNameœ:œinput_valueœ,œidœ:œChatOutput-ZlkFGœ,œinputTypesœ:[œMessageœ],œtypeœ:œstrœ}",
+        "animated": false,
+        "className": ""
+      }
+    ],
+    "viewport": {
+      "x": 12.9108604108269,
+      "y": 185.20702491559578,
+      "zoom": 0.9386038740304897
+    }
+  },
+  "updated_at": "2025-02-09T23:05:55+00:00",
+  "description": "Reference implementation.",
+  "webhook": false,
+  "icon": null,
+  "locked": false,
+  "name": "Translation 0.4 Test",
+  "endpoint_name": null
+}
