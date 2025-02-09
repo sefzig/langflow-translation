@@ -15,7 +15,7 @@ inputLanguage = "TextInput-kFVwL"
 
 class CustomComponent(Component):
     display_name = "Translation 0.4"
-    description = "Translate the Input Text to the specified Output Language. Make sure the Input Text does not contain line breaks or double quotes. Estimated processing time is ~5 minutes for ~5000 tokens (M4 max 64GB)."
+    description = "Translate the Input Text to the specified Output Language. Make sure the Input Text does not contain line breaks or double quotes. Estimated processing time is ~5 minutes for ~5000 tokens (Macbook M4max 64GB)."
     documentation: str = "http://docs.langflow.org/components/custom"
     icon = "languages"
     name = "Translation04"

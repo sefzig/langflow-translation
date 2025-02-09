@@ -55,6 +55,12 @@ Soft
    * Choose a language to translate to in the `Translation *` component.
    * Enter text to translate in the Playground.
 
-## License
+## Appendix
+
+### Notes
+
+See something similar discussed [here](https://www.youtube.com/watch?v=g_1gNmWARqY).
+
+### License
 
 This project is licensed under the MIT License.
